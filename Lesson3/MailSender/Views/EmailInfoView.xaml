@@ -3,12 +3,16 @@
     	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
+        xmlns:ViewModel="clr-namespace:MailSender.ViewModel"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     	xmlns:ignore="http://www.ignore.com"
     	mc:Ignorable="d ignore"
-        Height="Auto" Width="Auto"
-    	DataContext="{Binding Main, Source={StaticResource Locator}}">
+        Height="Auto" Width="Auto">
+
+    <UserControl.DataContext>
+        <ViewModel:EmailInfoModel/>
+    </UserControl.DataContext>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,29 +21,23 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Loaded">
-                <mvvm:EventToCommand Command="{Binding ReadEmailsCommand}" />
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
-
         <TextBlock TextWrapping="Wrap"
                 	TextAlignment="Center" Text="Получатели сообщений" FontWeight="Bold"/>
-        <Button x:Name="btnloadallemails" Content="Отобразить данные"
-            	Grid.Row="3"
-            	FontWeight="Bold"
-            	Width="140"
-            	Command="{Binding ReadEmailsCommand}"/>
-        <DataGrid x:Name="dgEmails" Grid.Row="2" ItemsSource="{Binding Emails}"
+        <DataGrid x:Name="dgEmails" Grid.Row="2" ItemsSource="{Binding EmailsSearch}"
              	ColumnWidth="*"  Margin="0,10,0,28"
                	IsReadOnly="True">
         </DataGrid>
-        <TextBlock HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="1"
-               	TextWrapping="Wrap" Text="Поиск по имени:" VerticalAlignment="Top"
-               	Width="231"/>
+        <TextBlock HorizontalAlignment="Left" Margin="150,10,0,0" Grid.Row="1"
+               	TextWrapping="Wrap" Text="Поиск по имени:" VerticalAlignment="Top"/>
         <TextBox HorizontalAlignment="Left" Height="30" Margin="262,7,0,0"
              	Grid.Row="1" TextWrapping="Wrap"  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
              	VerticalAlignment="Top" Width="310">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="TextChanged">
+                    <i:InvokeCommandAction Command="{Binding SearchCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
         </TextBox>
+        <Button Grid.Row="3" Width="200" Content="Удалить получателя из списка" Command="{Binding DeleteEmailCommand}" CommandParameter="{Binding ElementName=dgEmails, Path=SelectedItem}"/>
     </Grid>
 </UserControl>

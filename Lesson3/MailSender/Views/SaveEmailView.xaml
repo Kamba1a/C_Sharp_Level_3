@@ -3,32 +3,31 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ViewModel="clr-namespace:MailSender.ViewModel"
         xmlns:ignore="http://www.galasoft.ch/ignore"
-        mc:Ignorable="d ignore"
-        DataContext="{Binding Main, Source={StaticResource Locator}}">
+        mc:Ignorable="d ignore">
 
-    <Grid Margin="0 50 0 0">
+    <UserControl.DataContext>
+        <ViewModel:SaveEmailModel/>
+    </UserControl.DataContext>
+
+    <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="20"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" MinWidth="50"/>
+            <ColumnDefinition Width="Auto" MinWidth="90"/>
         </Grid.ColumnDefinitions>
-        <TextBlock TextWrapping="Wrap" Text="Id:"/>
-        <TextBlock Grid.Row="1" TextWrapping="Wrap" Text="Value:"/>
-        <TextBlock Grid.Row="2" TextWrapping="Wrap" Text="Name:"/>
+        <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Добавить получателя:" FontWeight="Bold" Margin="0,50,0,0"/>
+        <Label Grid.Row="1" Content="Email:"/>
+        <Label Grid.Row="2" Content="Имя:"/>
 
-        <TextBox Grid.Column="1" TextWrapping="Wrap" Text="{Binding EmailInfo.Id,Mode=TwoWay}"/>
-        <TextBox Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding EmailInfo.Value,Mode=TwoWay}"/>
-        <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="{Binding EmailInfo.Name,Mode=TwoWay}"/>
-        <Button Content="Сохранить" 
-                FontWeight="Bold" Grid.Row="5"
-                Grid.ColumnSpan="2"
-                 Command="{Binding SaveCommand}" CommandParameter="{Binding EmailInfo}" Height="22" Width="140"/>
+        <TextBox Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding StrEmail, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+        <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="{Binding StrName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+        <Button Content="Сохранить" FontWeight="Bold" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding SaveCommand}"/>
     </Grid>
 </UserControl>

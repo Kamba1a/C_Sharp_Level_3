@@ -1,6 +1,0 @@
-D:\users\kam\source\repos\Lesson3\WpfEmailSendServiceDLL\bin\Debug\WpfEmailSendServiceDLL.dll
-D:\users\kam\source\repos\Lesson3\WpfEmailSendServiceDLL\bin\Debug\WpfEmailSendServiceDLL.pdb
-D:\users\kam\source\repos\Lesson3\WpfEmailSendServiceDLL\obj\Debug\WpfEmailSendServiceDLL.csprojAssemblyReference.cache
-D:\users\kam\source\repos\Lesson3\WpfEmailSendServiceDLL\obj\Debug\WpfEmailSendServiceDLL.csproj.CoreCompileInputs.cache
-D:\users\kam\source\repos\Lesson3\WpfEmailSendServiceDLL\obj\Debug\WpfEmailSendServiceDLL.dll
-D:\users\kam\source\repos\Lesson3\WpfEmailSendServiceDLL\obj\Debug\WpfEmailSendServiceDLL.pdb

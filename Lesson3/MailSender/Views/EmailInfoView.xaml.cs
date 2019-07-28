@@ -22,7 +22,7 @@ namespace MailSender.Views
         public EmailInfoView()
         {
             InitializeComponent();
-            DataContext = App.MVM;
         }
+
     }
 }

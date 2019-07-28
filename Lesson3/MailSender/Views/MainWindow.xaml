@@ -1,0 +1,103 @@
+﻿<Window x:Class="MailSender.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MailSender"
+        xmlns:TabSwitcher="clr-namespace:TabSwitcher;assembly=TabSwitcher"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:Views="clr-namespace:MailSender.Views"
+        xmlns:ViewModel="clr-namespace:MailSender.ViewModel"
+        mc:Ignorable="d"
+        Title="Отправка электронной почты" Height="450" Width="800" Icon="/MailSender;component/Images/letter.jpg" WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <ViewModel:MainWindowModel/>
+    </Window.DataContext>
+    
+    <DockPanel>
+        <Menu Height="25" Width="Auto" VerticalAlignment="Top" DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+            <MenuItem Header="Файл">
+                <MenuItem x:Name="miClose" Header="Закрыть" HorizontalAlignment="Left" Click="MiClose_Click"/>
+            </MenuItem>
+        </Menu>
+        <TabControl x:Name="tabControl" Height="Auto" Width="Auto" DockPanel.Dock="Top">
+            <TabItem Header="Формирование группы рассылки">
+                <StackPanel>
+                    <ToolBarTray Width="Auto" Height="Auto">
+                        <ToolBar x:Name="tbSender" Height="30" Width="Auto">
+                            <Label Content="Выбрать отправителя" Width="130" Height="25"/>
+                            <ComboBox x:Name="cbSenderSelect" Height="25" Width="270" ToolTip="Выбрать email отправителя" Text="{Binding Login}" ItemsSource="{Binding SenderEmailsCol}" DisplayMemberPath="Email" SelectedValuePath="Server" SelectionChanged="CbSenderSelect_SelectionChanged"/>
+                            <Button Width="25" Height="25" ToolTip="Добавить">
+                                <Image  Source="/MailSender;component/Images/add.png" Height="16" Width="16"/>
+                            </Button>
+                            <Button Width="25" Height="25" ToolTip="Редактировать">
+                                <Image Source="/MailSender;component/Images/edit.png"/>
+                            </Button>
+                            <Button Width="25" Height="25" ToolTip="Удалить">
+                                <Image Source="/MailSender;component/Images/delete.png"/>
+                            </Button>
+                        </ToolBar>
+                        <ToolBar x:Name="tbSmtp" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="Auto" Band="1" BandIndex="0">
+                            <Label Content="Введите пароль:" HorizontalContentAlignment="Right" Height="25" Width="130"/>
+                            <PasswordBox x:Name="PasBox" Height="25" VerticalAlignment="Top" Width="270"/>
+                            <!--ComboBox x:Name="cbSmtpServer" Height="25" VerticalAlignment="Top" Width="270"/-->
+                        </ToolBar>
+                        <ToolBar x:Name="tbPlanner" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="230" Band="0" BandIndex="1" >
+                            <Label Content="Перейти в планировщик" Height="25" Width="Auto"/>
+                            <Button x:Name="btnClock" Width="25" Height="25" ToolTip="Перейти в планировщик" Click="BtnClock_Click">
+                                <Image Source="/MailSender;component/Images/clock.png"/>
+                            </Button>
+                        </ToolBar>
+                        <ToolBar Height="30" Width="Auto" Band="2">
+                            <Label Content="SMTP-сервер:" HorizontalContentAlignment="Right" Height="25" Width="130"/>
+                            <TextBox x:Name="txtbxServer" Height="25" VerticalAlignment="Top" Width="270" Text="{Binding Path=SmtpServer, UpdateSourceTrigger=PropertyChanged}"/>
+                        </ToolBar>
+                    </ToolBarTray>
+                    <Grid Width="Auto" Height="250">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="313*"/>
+                        </Grid.ColumnDefinitions>
+                        <Views:EmailInfoView Width="Auto" Height="Auto" Grid.Column="1"/>
+                        <Views:SaveEmailView Grid.Column="0" VerticalAlignment= "Stretch" HorizontalAlignment="Center" Width="Auto"/>
+                    </Grid>
+                </StackPanel>
+            </TabItem>
+            <TabItem x:Name="tabPlanner" Header="Планировщик">
+                <Grid Width="Auto" Height="Auto">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <Calendar x:Name="cldSchedulDateTimes" SelectionMode="MultipleRange"/>
+                        <xctk:TimePicker x:Name="tbTimePicker"/>
+                        <Button x:Name="btnSend" Command="{Binding BtnSendClickCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/MailSender;component/Images/clock.png" Width="16" Height="16"/>
+                                <TextBlock Margin="3,0,0,0" Text="Отправить запланированно" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="btnSendAtOnce" Command="{Binding BtnSendAtOnceClickCommand}" CommandParameter="{Binding ElementName=PasBox, Path=SecurePassword}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/MailSender;component/Images/letter.jpg" Width="16" Height="16"/>
+                                <TextBlock Text="Отправить сразу" Margin="10,0,0,0"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="tbitmMail" Header="Редактор текста письма">
+                <DockPanel>
+                    <Label DockPanel.Dock="Top" Content="Заголовок письма:" HorizontalAlignment="Center"/>
+                    <TextBox x:Name="txtbxSubject" DockPanel.Dock="Top" Margin="20,0,20,5"  Text="{Binding MailSubject}"/>
+                    <Label DockPanel.Dock="Top" Content="Текст письма:" HorizontalAlignment="Center"/>
+                    <TextBox x:Name="txtbxBody" DockPanel.Dock="Top" Width="Auto" Height="Auto" Margin="20,0,20,20" Text="{Binding MailBody}"/>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Статистика">
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

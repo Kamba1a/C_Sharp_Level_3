@@ -23,7 +23,6 @@ namespace MailSender.Views
         public SaveEmailView()
         {
             InitializeComponent();
-            DataContext = App.MVM;
         }
     }
 }

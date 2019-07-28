@@ -5,7 +5,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using MailSender.ViewModel;
 
 namespace MailSender
 {
@@ -16,6 +15,5 @@ namespace MailSender
 
     public partial class App : Application
     {
-        public static MainViewModel MVM = new MainViewModel(new Services.DataAccessService());
     }
 }
