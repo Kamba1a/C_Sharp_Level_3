@@ -71,9 +71,9 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <Calendar x:Name="cldSchedulDateTimes" SelectionMode="MultipleRange"/>
-                        <xctk:TimePicker x:Name="tbTimePicker"/>
-                        <Button x:Name="btnSend" Command="{Binding BtnSendClickCommand}">
+                        <Calendar SelectionMode="MultipleRange" SelectedDate="{Binding SendDate}"/>
+                        <xctk:TimePicker Text="{Binding SendTime}"/>
+                        <Button x:Name="btnSend" Command="{Binding BtnSendScheduledClickCommand}" CommandParameter="{Binding ElementName=PasBox, Path=SecurePassword}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="/MailSender;component/Images/clock.png" Width="16" Height="16"/>
                                 <TextBlock Margin="3,0,0,0" Text="Отправить запланированно" VerticalAlignment="Center" />

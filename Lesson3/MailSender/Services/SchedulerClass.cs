@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Threading;
-using System.Windows;
-using WpfEmailSendServiceDLL;
-using System.Collections.ObjectModel;
+using MailSender.Services;
 
 
 namespace MailSender
@@ -17,10 +12,21 @@ namespace MailSender
     /// </summary>
     class SchedulerClass
     {
-        DispatcherTimer timer = new DispatcherTimer();  // таймер 
-        WpfEmailSendService emailSender;                // экземпляр класса, отвечающего за отправку писем
-        DateTime dtSend;                                // дата и время отправки
-        ObservableCollection<Emails> emails;            // коллекция email-ов адресатов
+        DispatcherTimer timer;              //таймер 
+        DateTime dtSend;                    //дата и время отправки
+        EmailSendService emailSender;       //экземпляр класса, отвечающего за отправку писем
+        List<string> _listEmails;           //емейл адреса получателей
+        string _mailSubject;                //заголовок письма                     
+        string _mailBody;                   //текст письма
+
+
+        public SchedulerClass(string mailSubject, string mailBody, List<string> emails)
+        {
+            timer = new DispatcherTimer();
+            this._mailSubject = mailSubject;
+            this._mailBody = mailBody;
+            _listEmails = emails;
+        }
 
         /// <summary>
         /// Преобразует string в TimeSpan
@@ -44,11 +50,11 @@ namespace MailSender
         /// <param name="dtSend"></param>
         /// <param name="emailSender"></param>
         /// <param name="emails"></param>
-        public void SendMails(DateTime dtSend, WpfEmailSendService emailSender, ObservableCollection<Emails> emails)
+        public void SendMails(DateTime dtSend, EmailSendService emailSender)
         {
-            this.emailSender = emailSender; // Экземпляр класса, отвечающего за отправку писем, присваиваем 
             this.dtSend = dtSend;
-            this.emails = emails;
+            this.emailSender = emailSender; 
+
             timer.Tick += Timer_Tick;
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Start();
@@ -63,12 +69,8 @@ namespace MailSender
         {
             if (dtSend.ToShortTimeString() == DateTime.Now.ToShortTimeString())
             {
-                List<string> listEmails = new List<string>();
-                foreach (Emails em in emails) listEmails.Add(em.Value);
-
-                emailSender.SendMails(WpfMailSender.MailSubject, WpfMailSender.MailBody, listEmails);
+                emailSender.SendMails(_mailSubject, _mailBody, _listEmails);
                 timer.Stop();
-                MessageBox.Show("Отправка писем завершена");
             }
         }
     }

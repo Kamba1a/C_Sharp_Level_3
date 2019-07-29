@@ -3,6 +3,9 @@ using System.Windows.Input;
 
 namespace MailSender.ViewModel
 {
+    /// <summary>
+    /// Класс, реализующий интерфейс ICommand
+    /// </summary>
     public class RelayCommand :ICommand
     {
         Action<object> _execute;

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
@@ -11,25 +7,29 @@ using System.Security;
 
 namespace MailSender.Services
 {
+    /// <summary>
+    /// Класс для отправки электронной почты
+    /// </summary>
     public class EmailSendService
     {
-        private SecureString _myPassword;
-        private string _myEmail;
-
-        public Action<string> MessageMailSend;
-        public Action<string> MessageBeforeSendMail;
+        public Action<string> MessageMailSend;          //сообщение об отправке почты
+        public Action<string> MessageBeforeSendMail;    //сообщение перед отправкой почты
+        private SecureString _myPassword;               //пароль
+        private string _myEmail;                        //емейл-адрес отправителя
+        public string SmtpServer { get; set; }          //smtp-сервер
+        public int SmtpPort { get; set; }               //порт
 
         public EmailSendService(string myEmail, SecureString myPassword)
         {
             _myEmail = myEmail;
             _myPassword = myPassword;
             SmtpServer = "smtp." + new Regex("(?<=@).*").Match(_myEmail).Value;
-            SmtpPort = 587;
+            SmtpPort = 25;
         }
 
-        public string SmtpServer { get; set; }
-        public int SmtpPort { get; set; }
-
+        /// <summary>
+        /// Отправка почты
+        /// </summary>
         public void SendMails(string mailSubject, string mailBody, ICollection<string> sendEmailsList)
         {
             foreach (string mail in sendEmailsList)

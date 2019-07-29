@@ -125,6 +125,7 @@
     <Compile Include="Services\CheckEmail.cs" />
     <Compile Include="Services\DataAccesService.cs" />
     <Compile Include="Services\EmailSendService.cs" />
+    <Compile Include="Services\SchedulerClass.cs" />
     <Compile Include="ViewModel\EmailInfoModel.cs" />
     <Compile Include="ViewModel\MainWindowModel.cs" />
     <Compile Include="Services\RelayCommand.cs" />

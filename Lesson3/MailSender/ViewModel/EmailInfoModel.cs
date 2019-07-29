@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using MailSender.ViewModel;
+﻿using System.Collections.ObjectModel;
 using MailSender.Services;
-using System.ComponentModel;
 using MailSender.DataClasses;
 using System.Windows;
 
 namespace MailSender.ViewModel
 {
+    /// <summary>
+    /// ViewModel для EmailInfoView (UserControl для работы со списком получателей)
+    /// </summary>
     public class EmailInfoModel
     {
-        DataAccessService _dataAccessService;
-        public static ObservableCollection<Emails> EmailsCol { get; set; }
-        public static ObservableCollection<Emails> EmailsSearch { get; set; }
-        public RelayCommand SearchCommand { get; set; }
-        public RelayCommand DeleteEmailCommand { get; set; }
-        public string Name { get; set; }
-        public Emails Email { get; set; }
+        DataAccessService _dataAccessService;                                   //класс для работы с БД
+        public static ObservableCollection<Emails> EmailsCol { get; set; }      //коллекция емейлов получателей (всех)
+        public static ObservableCollection<Emails> EmailsSearch { get; set; }   //коллекция емейлов получателей (только искомых)
+        public string Name { get; set; }                                        //принимает имя получателя для поиска в списке получателей
+        public RelayCommand SearchCommand { get; set; }                         //команда для поиска в списке получателей
+        public RelayCommand DeleteEmailCommand { get; set; }                    //команда для удаления получателя из списка (из базы и коллекций)
 
         public EmailInfoModel()
         {
@@ -33,6 +28,9 @@ namespace MailSender.ViewModel
             CopyEmails();
         }
 
+        /// <summary>
+        /// Получение из БД списка всех получателей
+        /// </summary>
         void GetEmails()
         {
             EmailsCol.Clear();
@@ -42,6 +40,9 @@ namespace MailSender.ViewModel
             }
         }
 
+        /// <summary>
+        /// Копирование списка получателей из коллекции EmailsCol в EmailsSearch
+        /// </summary>
         void CopyEmails()
         {
             foreach (Emails e in EmailsCol)
@@ -50,6 +51,9 @@ namespace MailSender.ViewModel
             }
         }
 
+        /// <summary>
+        /// Наполнение коллекции EmailsSearch только искомыми получателями
+        /// </summary>
         void SearchEmail(object obj=null)
         {
             EmailsSearch.Clear();
@@ -66,6 +70,9 @@ namespace MailSender.ViewModel
             }
         }
 
+        /// <summary>
+        /// Удаление получателя из БД и коллекций
+        /// </summary>
         void DeleteEmail(object obj)
         {
             if (obj == null) MessageBox.Show("Выберите получателя");

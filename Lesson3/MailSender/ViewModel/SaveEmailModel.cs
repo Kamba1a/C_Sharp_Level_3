@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using MailSender.Services;
+﻿using MailSender.Services;
 using System.ComponentModel;
 using MailSender.DataClasses;
-using MailSender.ViewModel;
 using System.Windows;
 
 namespace MailSender.ViewModel 
 {
+    /// <summary>
+    /// ViewModel для SaveEmailView (UserControl для добавления нового емейла получателя)
+    /// </summary>
     public class SaveEmailModel: INotifyPropertyChanged
     {
-        DataAccessService _dataAccessService;
-        private string _strEmail;
-        private string _strName;
-        public event PropertyChangedEventHandler PropertyChanged;
-        public RelayCommand SaveCommand { get; set; }
-        public Emails EmailInfo { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;   //реализация интерфейса INotifyPropertyChanged
+        DataAccessService _dataAccessService;                       //класс для работы с БД
+        private string _strEmail;                                   //принимает емейл-адрес нового получателя (Emails.Email)
+        private string _strName;                                    //принимает имя нового получателя (Emails.Name)
+        public Emails EmailInfo { get; set; }                       //объединяет в себе  адрес/имя получателя для добавления в список получателей
+        public RelayCommand SaveCommand { get; set; }               //команда для добавления нового получателя
 
         public SaveEmailModel()
         {
@@ -28,6 +24,9 @@ namespace MailSender.ViewModel
             EmailInfo = new Emails();
         }
 
+        /// <summary>
+        /// принимает имя нового получателя (Emails.Name)
+        /// </summary>
         public string StrEmail
         {
             get
@@ -42,6 +41,9 @@ namespace MailSender.ViewModel
             }
         }
 
+        /// <summary>
+        /// принимает имя нового получателя (Emails.Name)
+        /// </summary>
         public string StrName
         {
             get
@@ -56,6 +58,9 @@ namespace MailSender.ViewModel
             }
         }
 
+        /// <summary>
+        /// Добавляет новый емейл в список получателей (в БД и коллекции из класса EmailInfoModel)
+        /// </summary>
         void SaveEmail(object obj=null)
         {
             if (string.IsNullOrEmpty(EmailInfo.Email))
@@ -80,6 +85,9 @@ namespace MailSender.ViewModel
             else MessageBox.Show(res);
         }
 
+        /// <summary>
+        /// Реализация интерфейса INotifyPropertyChanged
+        /// </summary>
         void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
