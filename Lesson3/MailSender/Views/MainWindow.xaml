@@ -9,7 +9,7 @@
         xmlns:Views="clr-namespace:MailSender.Views"
         xmlns:ViewModel="clr-namespace:MailSender.ViewModel"
         mc:Ignorable="d"
-        Title="Отправка электронной почты" Height="450" Width="800" Icon="/MailSender;component/Images/letter.jpg" WindowStartupLocation="CenterScreen">
+        Title="Отправка электронной почты" Height="500" Width="800" Icon="/MailSender;component/Images/letter.jpg" WindowStartupLocation="CenterScreen" ScrollViewer.CanContentScroll="True">
 
     <Window.DataContext>
         <ViewModel:MainWindowModel/>
