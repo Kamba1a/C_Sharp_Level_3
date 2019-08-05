@@ -11,11 +11,11 @@
         mc:Ignorable="d"
         Title="Отправка электронной почты" Height="500" Width="800" Icon="/MailSender;component/Images/letter.jpg" WindowStartupLocation="CenterScreen" ScrollViewer.CanContentScroll="True">
 
-    <Window.DataContext>
-        <ViewModel:MainWindowViewModel/>
-    </Window.DataContext>
-    
-    <DockPanel>
+    <Window.Resources>
+        <ViewModel:MainWindowViewModel x:Key="MainWindow"/>
+    </Window.Resources>
+
+    <DockPanel DataContext="{Binding Source={StaticResource MainWindow}}">
         <Menu Height="25" Width="Auto" VerticalAlignment="Top" DockPanel.Dock="Top" HorizontalAlignment="Stretch">
             <MenuItem Header="Файл">
                 <MenuItem x:Name="miClose" Header="Закрыть" HorizontalAlignment="Left" Click="MiClose_Click"/>
@@ -70,9 +70,22 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <Calendar SelectionMode="MultipleRange" SelectedDate="{Binding SendDate}"/>
-                        <xctk:TimePicker Text="{Binding SendTime}"/>
+                    <StackPanel Margin="5"  Grid.Column="0">
+                        <!--Calendar SelectionMode="MultipleRange" SelectedDate="{Binding SendDate}"/-->
+                        <!--xctk:TimePicker Text="{Binding SendTime}"/-->
+                        <Button Content="Добавить письмо" Command="{Binding BtnAddMail}"/>
+                        <ListView Height="150" ItemsSource="{Binding SendMails}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <!--Views:ListViewItemScheduler Text="{Binding SendDateTime}"/-->
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="//" Width="25" Click="BtnEditEmailText_Click" Tag="{Binding SendDateTime}"/>
+                                        <DatePickerTextBox x:Name="dptxtbx" Width="125" Text="{Binding SendDateTime}"/>
+                                        <Button Content="-" Width="25" DataContext="{Binding Source={StaticResource MainWindow}}" Command="{Binding BtnDelMail}" CommandParameter="{Binding ElementName=dptxtbx, Path=Text}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                         <Button x:Name="btnSend" Command="{Binding BtnSendScheduledClickCommand}" CommandParameter="{Binding ElementName=PasBox, Path=SecurePassword}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="/MailSender;component/Images/clock.png" Width="16" Height="16"/>

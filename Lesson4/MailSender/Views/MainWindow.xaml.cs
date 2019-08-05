@@ -42,5 +42,14 @@ namespace MailSender.Views
         {
             txtbxServer.Text = cbSenderSelect.SelectedValue.ToString();
         }
+
+        /// <summary>
+        /// Кнопка "Редактировать письмо" элемента в списке писем для запланированной отправки
+        /// </summary>
+        public void BtnEditEmailText_Click(object sender, RoutedEventArgs e)
+        {
+            MailTextWindow mailText = new MailTextWindow((sender as Button).Tag);
+            mailText.ShowDialog();
+        }
     }
 }

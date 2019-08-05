@@ -15,11 +15,22 @@ namespace MailSender
     public class SchedulerClass
     {
         DispatcherTimer timer;              //таймер 
-        DateTime dtSend;                    //дата и время отправки
+        //DateTime dtSend;                  //дата и время отправки
         EmailSendService emailSender;       //экземпляр класса, отвечающего за отправку писем
         List<string> _listEmails;           //емейл адреса получателей
         string _mailSubject;                //заголовок письма                     
         string _mailBody;                   //текст письма
+
+        Dictionary<DateTime, string> dicDates = new Dictionary<DateTime, string>();
+        public Dictionary<DateTime, string> DatesEmailTexts
+        {
+            get { return dicDates; }
+            set
+            {
+                dicDates = value;
+                dicDates = dicDates.OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
+            }
+        }
 
         public SchedulerClass(string mailSubject, string mailBody, List<string> emails)
         {
@@ -51,9 +62,10 @@ namespace MailSender
         /// <param name="dtSend"></param>
         /// <param name="emailSender"></param>
         /// <param name="emails"></param>
-        public void SendMails(DateTime dtSend, EmailSendService emailSender)
+        //public void SendMails(DateTime dtSend, EmailSendService emailSender)
+        public void SendMails(EmailSendService emailSender)
         {
-            this.dtSend = dtSend;
+            //this.dtSend = dtSend;
             this.emailSender = emailSender; 
 
             timer.Tick += Timer_Tick;
@@ -68,11 +80,25 @@ namespace MailSender
         /// <param name="e"></param>
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (dtSend.ToShortTimeString() == DateTime.Now.ToShortTimeString())
+            //if (dtSend.ToShortTimeString() == DateTime.Now.ToShortTimeString())
+            //{
+            //    emailSender.SendMails(_mailSubject, _mailBody, _listEmails);
+            //    timer.Stop();
+            //}
+
+            if (dicDates.Count == 0)
             {
-                emailSender.SendMails(_mailSubject, _mailBody, _listEmails);
                 timer.Stop();
+                MessageBox.Show("Письма отправлены.");
             }
+            else if (dicDates.Keys.First<DateTime>().ToShortTimeString() == DateTime.Now.ToShortTimeString())
+            {
+                _mailBody = dicDates[dicDates.Keys.First<DateTime>()];
+                _mailSubject = $"Рассылка от {dicDates.Keys.First<DateTime>().ToShortTimeString()} ";
+                emailSender.SendMails(_mailSubject, _mailBody, _listEmails);
+                dicDates.Remove(dicDates.Keys.First<DateTime>());
+            }
+
         }
     }
 }

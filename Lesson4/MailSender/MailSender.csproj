@@ -95,6 +95,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\ListViewItemScheduler.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MailTextWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -125,6 +133,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SmtpServers.dbml</DependentUpon>
     </Compile>
+    <Compile Include="Models\Mail.cs" />
     <Compile Include="Services\CheckEmail.cs" />
     <Compile Include="Services\EmailSendService.cs" />
     <Compile Include="Services\SchedulerClass.cs" />
@@ -134,6 +143,12 @@
     <Compile Include="ViewModel\SaveEmailViewModel.cs" />
     <Compile Include="Views\EmailInfoView.xaml.cs">
       <DependentUpon>EmailInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ListViewItemScheduler.xaml.cs">
+      <DependentUpon>ListViewItemScheduler.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MailTextWindow.xaml.cs">
+      <DependentUpon>MailTextWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

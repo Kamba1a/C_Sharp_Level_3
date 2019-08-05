@@ -13,6 +13,9 @@ namespace MailSender.Views
             InitializeComponent();
         }
 
+        /// <summary>
+        /// для валидации вводимых данных
+        /// </summary>
         private void TextBox_Error(object sender, ValidationErrorEventArgs e)
         {
             if (e.Action == ValidationErrorEventAction.Added)

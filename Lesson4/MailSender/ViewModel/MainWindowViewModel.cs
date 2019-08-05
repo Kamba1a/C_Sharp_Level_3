@@ -7,6 +7,7 @@ using MailSender.DataClasses;
 using System.Security;
 using System;
 using System.Linq;
+using MailSender.Models;
 
 namespace MailSender.ViewModel
 {
@@ -26,7 +27,16 @@ namespace MailSender.ViewModel
         public DateTime SendDate { get; set; }                                          //дата отправки почты
         public RelayCommand BtnSendAtOnceClickCommand { get; set; }                     //команда для отправки почты сразу
         public RelayCommand BtnSendScheduledClickCommand { get; set; }                  //команда для отправки почты отложено
+        public RelayCommand BtnAddMail { get; set; }                                    //команда для добавления письма в список отложенной отправки
         EmailSendService emailSender;                                                   //класс для отправки почты
+
+        //незаконченая часть к ДЗ№4
+        public string MailText {get; set;}
+        public RelayCommand BtnSaveMailText{get; set;}
+        public RelayCommand BtnDelMail{get; set;}
+        public ObservableCollection<SendMailClass> SendMails { get; set; }
+        
+
 
         public MainWindowViewModel()
         {
@@ -34,8 +44,36 @@ namespace MailSender.ViewModel
             SenderEmailsCol = new ObservableCollection<SenderEmails>();
             BtnSendAtOnceClickCommand = new RelayCommand(SendEmailsAtOnce);
             BtnSendScheduledClickCommand = new RelayCommand(SendEmailsScheduled);
+            BtnAddMail = new RelayCommand(AddMail);
             GetSenderEmails();
             GetSmtpServers();
+
+            //незаконченая часть к ДЗ№4
+            SendMails = new ObservableCollection<SendMailClass>();
+            BtnSaveMailText = new RelayCommand(SaveMailText);
+            BtnDelMail = new RelayCommand(DelMail);
+        }
+
+
+
+        //незаконченая часть к ДЗ№4 - удаление письма из ListView
+        void DelMail(object obj)
+        {
+            //не работает - linq запрос почему-то не находит результатов, в итоге List оказывается пустой:
+            SendMails.Remove((from f in SendMails where f.SendDateTime.Equals(DateTime.Parse(obj as string)) select f).ToList()[0]);
+        }
+
+        //незаконченая часть к ДЗ№4 - редактирование текста письма
+        void SaveMailText(object obj)
+        {
+            //хотела в качестве obj принимать параметр от MailTextWindow, но непонятно как передать
+            //(потом найти элемент в коллекции по (DateTime)obj).Mailtext=MailText;
+        }
+
+        //незаконченая часть к ДЗ№4 - добавление письма в ListView
+        void AddMail(object obj)
+        {
+            SendMails.Add(new SendMailClass());
         }
 
         /// <summary>
@@ -147,7 +185,8 @@ namespace MailSender.ViewModel
 
             if (FieldsIsEmpty()) return;
             EmailSenderCreate(obj as SecureString);
-            sc.SendMails(dtSendDateTime, emailSender);
+            sc.SendMails(emailSender);
+            //sc.SendMails(dtSendDateTime, emailSender);
             MessageBox.Show($"Отправка писем запланирована на {dtSendDateTime}");
         }
 
