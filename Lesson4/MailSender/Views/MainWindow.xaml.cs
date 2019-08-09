@@ -44,12 +44,21 @@ namespace MailSender.Views
         }
 
         /// <summary>
-        /// Кнопка "Редактировать письмо" элемента в списке писем для запланированной отправки
+        /// Кнопка "Отправить" - если письмо не заполнено, переключает вкладку на редактор письма
         /// </summary>
-        public void BtnEditEmailText_Click(object sender, RoutedEventArgs e)
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnSend_Click(object sender, RoutedEventArgs e)
         {
-            MailTextWindow mailText = new MailTextWindow((sender as Button).Tag);
-            mailText.ShowDialog();
+            if (cbSenderSelect.SelectedItem == null)
+            {
+                tabControl.SelectedItem = tbitmDistrGroup;
+                return;
+            }
+            if (string.IsNullOrEmpty(txtbxSubject.Text) || string.IsNullOrEmpty(txtbxBody.Text))
+            {
+                tabControl.SelectedItem = tbitmMail;
+            }
         }
     }
 }

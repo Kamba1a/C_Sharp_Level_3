@@ -6,32 +6,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace MailSender.Tests
 {
     [TestClass()]
     public class SchedulerClassTests
     {
-        SchedulerClass sc;
-        TimeSpan ts;
+        static SchedulerClass sc;
+        static TimeSpan ts;
 
-        // Запускается перед стартом каждого тестирующего метода. 
-        //[ClassInitialize] - с этим атрибутом тест почему-то не проходит
-        [TestInitialize]
-        public void TestInitialize()
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
         {
-            Debug.WriteLine("Test Initialize");
-            sc = new SchedulerClass("", "", new List<string>());
-            ts = new TimeSpan();    // возвращаем в случае ошибочно введенного времени
-
-            sc.DatesEmailTexts = new Dictionary<DateTime, string>()
-            {
-                { new DateTime(2016, 12, 24, 22, 0, 0), "text1" },
-                { new DateTime(2016, 12, 24, 22, 30, 0), "text2" },
-                { new DateTime(2016, 12, 24, 23, 0, 0), "text3" }
-            };
-
+            Debug.WriteLine("Class Initialize");
+            sc = new SchedulerClass(new List<string>());
+            ts = new TimeSpan();
         }
+
 
         [TestMethod()]
         public void GetSendTimeTest_empty_ts()
@@ -78,11 +70,18 @@ namespace MailSender.Tests
         }
 
         [TestMethod()]
-        public void TimeTick_Dictionare_correct()
+        public void TimerTick_Dictionare_correct()
         {
-            DateTime dt1 = new DateTime(2016, 12, 24, 22, 0, 0);
-            DateTime dt2 = new DateTime(2016, 12, 24, 22, 30, 0);
-            DateTime dt3 = new DateTime(2016, 12, 24, 23, 0, 0);
+            sc.DatesEmailTexts = new Dictionary<DateTime, string>()
+            {
+                { new DateTime(2019, 08, 15, 17, 0, 0), "text1" },
+                { new DateTime(2019, 08, 15, 17, 30, 0), "text2" },
+                { new DateTime(2019, 08, 15, 18, 0, 0), "text3" }
+            };
+
+            DateTime dt1 = new DateTime(2019, 08, 15, 17, 0, 0);
+            DateTime dt2 = new DateTime(2019, 08, 15, 17, 30, 0);
+            DateTime dt3 = new DateTime(2019, 08, 15, 18, 0, 0);
 
             if (sc.DatesEmailTexts.Keys.First<DateTime>().ToShortTimeString() == dt1.ToShortTimeString())
             {
@@ -108,5 +107,40 @@ namespace MailSender.Tests
             Assert.AreEqual(0, sc.DatesEmailTexts.Count);
         }
 
+        [TestMethod()]  //добавлено для ДЗ - тест на работу сортировки словаря
+        public void DatesEmailTexts_dictionary_OrderBy()
+        {
+            DateTime dt1 = new DateTime(2020, 02, 02, 0, 0, 0);
+            DateTime dt2 = new DateTime(2021, 01, 01, 0, 0, 0);
+            DateTime dt3 = new DateTime(2022, 12, 12, 0, 0, 0);
+            string text = "text";
+
+            Dictionary<DateTime, string> input = new Dictionary<DateTime, string>()
+            {
+                { dt3, text },
+                { dt2, text },
+                { dt1, text },
+            };
+
+            Dictionary<DateTime, string> expect = new Dictionary<DateTime, string>()
+            {
+                { dt1, text },
+                { dt2, text },
+                { dt3, text }
+            };
+
+            sc.DatesEmailTexts = input;
+
+            CollectionAssert.AreEqual(expect, sc.DatesEmailTexts);
+        }
+
+        //[TestMethod()] //проверка на добавление в словарь одинакового времени - просто смотрела что будет
+        //public void DatesEmailTexts_colToDic_addSameKey()
+        //{
+        //    DateTime dt1 = new DateTime(2020, 02, 02, 0, 0, 0);
+        //    DateTime dt2 = new DateTime(2021, 01, 01, 0, 0, 0);
+        //    List<DateTime> input = new List<DateTime>() { dt1, dt2, dt1};
+        //    sc.DatesEmailTexts = input.ToDictionary<DateTime,DateTime,string>(key=>key,el=>"");
+        //}
     }
 }

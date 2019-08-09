@@ -12,14 +12,27 @@ namespace MailSender.Services
     /// </summary>
     public class EmailSendService
     {
-        public Action<string> MessageMailSend;          //сообщение об отправке почты
-        public Action<string> MessageBeforeSendMail;    //сообщение перед отправкой почты
-        private SecureString _myPassword;               //пароль
-        private string _myEmail;                        //емейл-адрес отправителя
-        public string SmtpServer { get; set; }          //smtp-сервер
-        public int SmtpPort { get; set; }               //порт
+        string _myPassword;         //пароль
+        string _myEmail;            //емейл-адрес отправителя
 
-        public EmailSendService(string myEmail, SecureString myPassword)
+        /// <summary>
+        /// Сообщение после отправки почты
+        /// </summary>
+        public Action<string> MessageMailSend;
+        /// <summary>
+        /// Сообщение перед отправкой почты
+        /// </summary>
+        public Action<string> MessageBeforeSendMail;
+        /// <summary>
+        /// Smtp-сервер
+        /// </summary>
+        public string SmtpServer { get; set; }
+        /// <summary>
+        /// Порт
+        /// </summary>
+        public int SmtpPort { get; set; }
+
+        public EmailSendService(string myEmail, string myPassword)
         {
             _myEmail = myEmail;
             _myPassword = myPassword;
@@ -58,7 +71,7 @@ namespace MailSender.Services
                     }
                 }
             }
-            _myPassword.Dispose();
+            _myPassword = null;
         }
     }
 }

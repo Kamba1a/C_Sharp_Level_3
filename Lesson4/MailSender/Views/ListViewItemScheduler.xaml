@@ -7,15 +7,12 @@
              xmlns:ViewModel="clr-namespace:MailSender.ViewModel"
              xmlns:local="clr-namespace:MailSender.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="25" d:DesignWidth="175">
+             d:DesignHeight="25" d:DesignWidth="225"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
-    <UserControl.DataContext>
-        <ViewModel:MainWindowViewModel/>
-    </UserControl.DataContext>
-    
     <StackPanel Orientation="Horizontal">
-        <Button Content="//" Width="25" Click="BtnEditEmailText_Click" Tag="{Binding SendDateTime}"/>
-        <DatePickerTextBox x:Name="datePickerTextBox" Width="125"/>
-        <Button Content="-" Width="25" Command="{Binding BtnDelMail}" CommandParameter="{Binding SendDateTime}"/>
+        <Button Content="//" Width="25" Click="BtnEditMailText_Click"/>
+        <xctk:DateTimePicker x:Name="dtPicker" Width="175" Value="{Binding SendDateTime, UpdateSourceTrigger=PropertyChanged}" AutoCloseCalendar="True" ShowButtonSpinner="False"/>
+        <Button Content="-" Width="25" Click="BtnDelMail_Click"/>
     </StackPanel>
 </UserControl>

@@ -7,7 +7,8 @@ using MailSender.DataClasses;
 using System.Security;
 using System;
 using System.Linq;
-using MailSender.Models;
+using MailSender.Views;
+using System.Windows.Controls;
 
 namespace MailSender.ViewModel
 {
@@ -16,64 +17,37 @@ namespace MailSender.ViewModel
     /// </summary>
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        EmailSendService _emailSender;                                                  //класс для отправки почты
         public event PropertyChangedEventHandler PropertyChanged;                       //реализация интерфейса INotifyPropertyChanged
         public ObservableCollection<SmtpServers> SmtpServersCol { get; set; }           //коллекция Smtp-серверов
         public ObservableCollection<SenderEmails> SenderEmailsCol { get; set; }         //коллекция емейлов отправителя
+        public ObservableCollection<ListViewItemScheduler> SendMails { get; set; }      //коллекция писем для отложенной отправки
         public string MailSubject { get; set; }                                         //заголовок письма
         public string MailBody { get; set; }                                            //текст письма
         public string Login { get; set; }                                               //емейл-адрес отправителя
         public string SmtpServer { get; set; }                                          //Smtp-сервер для отправки
-        public string SendTime { get; set; }                                            //время отправки почты
-        public DateTime SendDate { get; set; }                                          //дата отправки почты
         public RelayCommand BtnSendAtOnceClickCommand { get; set; }                     //команда для отправки почты сразу
         public RelayCommand BtnSendScheduledClickCommand { get; set; }                  //команда для отправки почты отложено
         public RelayCommand BtnAddMail { get; set; }                                    //команда для добавления письма в список отложенной отправки
-        EmailSendService emailSender;                                                   //класс для отправки почты
-
-        //незаконченая часть к ДЗ№4
-        public string MailText {get; set;}
-        public RelayCommand BtnSaveMailText{get; set;}
-        public RelayCommand BtnDelMail{get; set;}
-        public ObservableCollection<SendMailClass> SendMails { get; set; }
-        
-
 
         public MainWindowViewModel()
         {
             SmtpServersCol = new ObservableCollection<SmtpServers>();
             SenderEmailsCol = new ObservableCollection<SenderEmails>();
+            SendMails = new ObservableCollection<ListViewItemScheduler>();
             BtnSendAtOnceClickCommand = new RelayCommand(SendEmailsAtOnce);
             BtnSendScheduledClickCommand = new RelayCommand(SendEmailsScheduled);
             BtnAddMail = new RelayCommand(AddMail);
             GetSenderEmails();
             GetSmtpServers();
-
-            //незаконченая часть к ДЗ№4
-            SendMails = new ObservableCollection<SendMailClass>();
-            BtnSaveMailText = new RelayCommand(SaveMailText);
-            BtnDelMail = new RelayCommand(DelMail);
         }
 
-
-
-        //незаконченая часть к ДЗ№4 - удаление письма из ListView
-        void DelMail(object obj)
+        /// <summary>
+        /// Добавляет новое письмо в список писем с запланированной отправкой
+        /// </summary>
+        void AddMail(object obj=null)
         {
-            //не работает - linq запрос почему-то не находит результатов, в итоге List оказывается пустой:
-            SendMails.Remove((from f in SendMails where f.SendDateTime.Equals(DateTime.Parse(obj as string)) select f).ToList()[0]);
-        }
-
-        //незаконченая часть к ДЗ№4 - редактирование текста письма
-        void SaveMailText(object obj)
-        {
-            //хотела в качестве obj принимать параметр от MailTextWindow, но непонятно как передать
-            //(потом найти элемент в коллекции по (DateTime)obj).Mailtext=MailText;
-        }
-
-        //незаконченая часть к ДЗ№4 - добавление письма в ListView
-        void AddMail(object obj)
-        {
-            SendMails.Add(new SendMailClass());
+            SendMails.Add(new ListViewItemScheduler(SendMails));
         }
 
         /// <summary>
@@ -101,40 +75,19 @@ namespace MailSender.ViewModel
         }
 
         /// <summary>
-        /// Проверка на заполненность обязательных полей
-        /// </summary>
-        bool FieldsIsEmpty()
-        {
-            if (string.IsNullOrEmpty(Login))
-            {
-                MessageBox.Show("Выберите отправителя");
-                return true;
-            }
-            //if ((obj as SecureString).Length==0)                                  //непонятно, как проверить SecureString на null, Length всегда =0
-            //{
-            //    MessageBox.Show("Укажите пароль отправителя");
-            //    return true;
-            //}
-            if (string.IsNullOrEmpty(MailSubject) || string.IsNullOrEmpty(MailBody))
-            {
-                MessageBox.Show("Заголовок и тело письма не должны быть пустыми");
-                //tabControl.SelectedItem = tbitmMail;                              //как сделать переключение вкладок из ViewModel?
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// передача данных в класс, отвечающий за отправку почты
         /// </summary>
-        void EmailSenderCreate(SecureString password)
+        void EmailSenderCreate(object obj)
         {
-            emailSender = new EmailSendService(Login, password);
-            emailSender.MessageBeforeSendMail += msg => MessageBox.Show(msg);       //подписка на вывод сообщения непосредственно перед отправкой писем
-            emailSender.MessageMailSend += msg => MessageBox.Show(msg);             //подписка на вывод сообщений после отправки писем
+            var passwordBox = obj as PasswordBox;
+            var password = passwordBox.Password;
 
-            emailSender.SmtpServer = SmtpServer;
-            emailSender.SmtpPort = (from f in SmtpServersCol
+            _emailSender = new EmailSendService(Login, password);
+            _emailSender.MessageBeforeSendMail += MessageBoxShow;
+            _emailSender.MessageMailSend += MessageBoxShow;
+
+            _emailSender.SmtpServer = SmtpServer;
+            _emailSender.SmtpPort = (from f in SmtpServersCol
                                     where f.Server == SmtpServer
                                     select f.Port).ToList<int>()[0];
         }
@@ -145,7 +98,6 @@ namespace MailSender.ViewModel
         List<string> ListEmails()
         {
             List<string> listEmails = new List<string>();
-            //foreach (Emails em in EmailInfoViewModel.EmailsCol) listEmails.Add(em.Email);
             foreach (Emails em in EmailInfoViewModel.EmailsCol) listEmails.Add(em.Email);
             return listEmails;
         }
@@ -155,10 +107,37 @@ namespace MailSender.ViewModel
         /// </summary>
         void SendEmailsAtOnce(object obj)
         {
-            if (FieldsIsEmpty()) return;
-            EmailSenderCreate(obj as SecureString);
-            emailSender.SendMails(MailSubject, MailBody, ListEmails());
+            if (!IsLoginFill()) return;
+            if (string.IsNullOrEmpty(MailSubject) || string.IsNullOrEmpty(MailBody))
+            {
+                MessageBox.Show("Заголовок и тело письма не должны быть пустыми");
+                return;
+            }
+            EmailSenderCreate(obj);
+            _emailSender.SendMails(MailSubject, MailBody, ListEmails());
             MessageBox.Show("Отправка писем завершена");
+        }
+
+        bool IsLoginFill()
+        {
+            if (string.IsNullOrEmpty(Login))
+            {
+                MessageBox.Show("Выберите отправителя");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Проверяет даты в SendMails, если находит некорректную, возвращает дату string, иначе null 
+        /// </summary>
+        string SendDatesCorrect()
+        {
+            foreach (ListViewItemScheduler mail in SendMails)
+            {
+                if (mail.SendDateTime < DateTime.Now) return mail.SendDateTime.ToString();
+            }
+            return null;
         }
 
         /// <summary>
@@ -166,28 +145,56 @@ namespace MailSender.ViewModel
         /// </summary>
         void SendEmailsScheduled(object obj)
         {
-            SchedulerClass sc = new SchedulerClass(MailSubject, MailBody, ListEmails());
-            TimeSpan tsSendTime = sc.GetSendTime(SendTime);
-
-            if (tsSendTime == new TimeSpan())
+            if (SendMails.Count==0)
             {
-                MessageBox.Show("Некорректный формат даты");
+                MessageBoxShow("Для запланированной отправки добавьте хотя бы одно письмо");
+                return;
+            }
+            if (!IsLoginFill()) return;
+            if (SendDatesCorrect()!=null)
+            {
+                MessageBoxShow($"Задайте для письма {SendDatesCorrect()} правильную дату и время \n(дата и время отправки не может быть раньше, чем настоящее время)");
                 return;
             }
 
-            DateTime dtSendDateTime = (SendDate!=new DateTime() ? SendDate: DateTime.Today).Add(tsSendTime);
+            SchedulerClass sc = new SchedulerClass(ListEmails());
+            sc.MessageAfterOneSend += MessageBoxShow;
+            sc.MessageAfterSendAll += MessageBoxShow;
+            sc.MessageAfterPlanning += MessageBoxShow;
 
-            if (dtSendDateTime < DateTime.Now)
+            try
             {
-                MessageBox.Show("Дата и время отправки писем не могут быть раньше, чем настоящее время");
+                //заполняем словарь
+                sc.DatesEmailTexts = SendMails.ToDictionary(mail => mail.SendDateTime, mail => mail.MailText);
+                #region
+                //так тоже можно заполнить словарь, но тогда нет обращения к сеттеру словаря, где настроена сортировка:
+                //foreach (ListViewItemScheduler mail in SendMails)
+                //{
+                //    if (mail.SendDateTime < DateTime.Now)
+                //    {
+                //        MessageBoxShow($"Для письма {mail.SendDateTime} заданы не верные дата и время \n(дата и время отправки писем не могут быть раньше, чем настоящее время). \nДанное письмо не будет отправлено.");
+                //        continue;
+                //    }
+                //    sc.DatesEmailTexts.Add(mail.SendDateTime, mail.MailText);
+                //}
+                #endregion
+            }
+            catch (ArgumentException)
+            {
+                MessageBoxShow("Нельзя запланировать два письма на одинаковое время");
                 return;
             }
 
-            if (FieldsIsEmpty()) return;
-            EmailSenderCreate(obj as SecureString);
-            sc.SendMails(emailSender);
-            //sc.SendMails(dtSendDateTime, emailSender);
-            MessageBox.Show($"Отправка писем запланирована на {dtSendDateTime}");
+            EmailSenderCreate(obj);
+            sc.SendMails(_emailSender);
+        }
+
+        /// <summary>
+        /// Вывод сообщения
+        /// </summary>
+        void MessageBoxShow(string msg)
+        {
+            MessageBox.Show(msg);
         }
 
         /// <summary>

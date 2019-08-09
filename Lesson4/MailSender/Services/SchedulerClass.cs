@@ -9,39 +9,39 @@ using MailSender.Services;
 namespace MailSender
 {
     /// <summary>
-    /// Класс-планировщик, который создает расписание, следит за его выполнением и напоминает о событиях
-    /// Также помогает автоматизировать рассылку писем в соответствии с расписанием
+    /// Класс-планировщик
     /// </summary>
     public class SchedulerClass
     {
-        DispatcherTimer timer;              //таймер 
-        //DateTime dtSend;                  //дата и время отправки
-        EmailSendService emailSender;       //экземпляр класса, отвечающего за отправку писем
-        List<string> _listEmails;           //емейл адреса получателей
-        string _mailSubject;                //заголовок письма                     
-        string _mailBody;                   //текст письма
+        DispatcherTimer _timer;                         //таймер 
+        EmailSendService _emailSender;                  //экземпляр класса, отвечающего за отправку писем
+        List<string> _listEmails;                       //емейл адреса получателей
+        string _mailSubject;                            //заголовок письма                     
+        string _mailBody;                               //текст письма
+        Dictionary<DateTime, string> _dicDates;         //список писем на отправку
 
-        Dictionary<DateTime, string> dicDates = new Dictionary<DateTime, string>();
-        public Dictionary<DateTime, string> DatesEmailTexts
-        {
-            get { return dicDates; }
-            set
-            {
-                dicDates = value;
-                dicDates = dicDates.OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
-            }
-        }
+        /// <summary>
+        /// Сообщение после отправки каждого письма
+        /// </summary>
+        public Action<string> MessageAfterOneSend;
+        /// <summary>
+        /// Сообщение после отправки всех писем
+        /// </summary>
+        public Action<string> MessageAfterSendAll;
+        /// <summary>
+        /// Сообщение после запуска таймера на отправку
+        /// </summary>
+        internal Action<string> MessageAfterPlanning;
 
-        public SchedulerClass(string mailSubject, string mailBody, List<string> emails)
+        public SchedulerClass(List<string> emails)
         {
-            timer = new DispatcherTimer();
-            this._mailSubject = mailSubject;
-            this._mailBody = mailBody;
+            _timer = new DispatcherTimer();
             _listEmails = emails;
+            _dicDates = new Dictionary<DateTime, string>();
         }
 
         /// <summary>
-        /// Преобразует string в TimeSpan
+        /// Преобразует string в TimeSpan - не используется, оставлен для проведения юнит-теста по ДЗ
         /// </summary>
         /// <param name="strSendTime"></param>
         /// <returns></returns>
@@ -57,48 +57,58 @@ namespace MailSender
         }
 
         /// <summary>
-        /// Отправка писем
+        /// Список запланированных на отправку писем (дата отправки-текст письма)
+        /// </summary>
+        public Dictionary<DateTime, string> DatesEmailTexts
+        {
+            get { return _dicDates; }
+            set
+            {
+                _dicDates = value;
+                _dicDates = _dicDates.OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
+            }
+        }
+
+        /// <summary>
+        /// Отправка писем - старт таймера
         /// </summary>
         /// <param name="dtSend"></param>
         /// <param name="emailSender"></param>
         /// <param name="emails"></param>
-        //public void SendMails(DateTime dtSend, EmailSendService emailSender)
         public void SendMails(EmailSendService emailSender)
         {
-            //this.dtSend = dtSend;
-            this.emailSender = emailSender; 
+            this._emailSender = emailSender; 
 
-            timer.Tick += Timer_Tick;
-            timer.Interval = new TimeSpan(0, 0, 1);
-            timer.Start();
+            _timer.Tick += TimerTick;
+            _timer.Interval = new TimeSpan(0, 0, 1);
+            _timer.Start();
+            MessageAfterPlanning?.Invoke("Отправка писем запланирована");
         }
 
         /// <summary>
-        /// Таймер
+        /// Отправка письма - выполняется по тику таймера
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Timer_Tick(object sender, EventArgs e)
+        private void TimerTick(object sender, EventArgs e)
         {
-            //if (dtSend.ToShortTimeString() == DateTime.Now.ToShortTimeString())
-            //{
-            //    emailSender.SendMails(_mailSubject, _mailBody, _listEmails);
-            //    timer.Stop();
-            //}
-
-            if (dicDates.Count == 0)
+            if (_dicDates.Count > 0)
             {
-                timer.Stop();
-                MessageBox.Show("Письма отправлены.");
+                DateTime _nextSend = _dicDates.Keys.First<DateTime>();
+                if (_nextSend.ToShortDateString()== DateTime.Now.ToShortDateString() && _nextSend.ToShortTimeString() == DateTime.Now.ToShortTimeString())
+                {
+                    _mailSubject = $"Рассылка от {_nextSend} ";
+                    _mailBody = _dicDates[_dicDates.Keys.First<DateTime>()];
+                    _emailSender.SendMails(_mailSubject, _mailBody, _listEmails);
+                    MessageAfterOneSend?.Invoke($"Письмо от {_nextSend} отправлено");
+                    _dicDates.Remove(_dicDates.Keys.First<DateTime>());
+                }
             }
-            else if (dicDates.Keys.First<DateTime>().ToShortTimeString() == DateTime.Now.ToShortTimeString())
+            else if (_dicDates.Count == 0)
             {
-                _mailBody = dicDates[dicDates.Keys.First<DateTime>()];
-                _mailSubject = $"Рассылка от {dicDates.Keys.First<DateTime>().ToShortTimeString()} ";
-                emailSender.SendMails(_mailSubject, _mailBody, _listEmails);
-                dicDates.Remove(dicDates.Keys.First<DateTime>());
+                _timer.Stop();
+                MessageAfterSendAll?.Invoke("Запланированная отправка писем завершена");
             }
-
         }
     }
 }

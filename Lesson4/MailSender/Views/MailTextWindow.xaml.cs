@@ -11,35 +11,62 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace MailSender.Views
 {
     /// <summary>
     /// Логика взаимодействия для MailText.xaml
     /// </summary>
-    public partial class MailTextWindow : Window
+    public partial class MailTextWindow : Window, INotifyPropertyChanged
     {
-        /// <summary>
-        /// Привязка окна к конкретному элементу списка
-        /// </summary>
-        DateTime SendDateTime {get; set;}
+        public event PropertyChangedEventHandler PropertyChanged;
+        string _mailText;
 
-        public MailTextWindow(object obj)
+        public MailTextWindow(string mailText)
         {
             InitializeComponent();
-            SendDateTime = (DateTime)obj;
+            MailText = mailText;
+        }
+
+        public string MailText
+        {
+            get { return _mailText; }
+            set
+            {
+                _mailText = value;
+                OnPropertyChanged(nameof(MailText));
+            }
         }
 
         /// <summary>
-        /// Кнопка "Отмена" - закрыть окно
+        /// Кнопка "Отмена"
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
             Close();
         }
 
+        /// <summary>
+        /// Кнопка "Сохранить"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnSaveMailText_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            Close();
+        }
 
+        /// <summary>
+        /// реализация интерфейса INotifyPropertyChanged
+        /// </summary>
+        void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

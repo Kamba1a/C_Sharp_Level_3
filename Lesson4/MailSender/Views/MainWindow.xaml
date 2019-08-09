@@ -22,7 +22,7 @@
             </MenuItem>
         </Menu>
         <TabControl x:Name="tabControl" Height="Auto" Width="Auto" DockPanel.Dock="Top">
-            <TabItem Header="Формирование группы рассылки">
+            <TabItem x:Name="tbitmDistrGroup" Header="Формирование группы рассылки">
                 <StackPanel>
                     <ToolBarTray Width="Auto" Height="Auto">
                         <ToolBar x:Name="tbSender" Height="30" Width="Auto">
@@ -74,25 +74,14 @@
                         <!--Calendar SelectionMode="MultipleRange" SelectedDate="{Binding SendDate}"/-->
                         <!--xctk:TimePicker Text="{Binding SendTime}"/-->
                         <Button Content="Добавить письмо" Command="{Binding BtnAddMail}"/>
-                        <ListView Height="150" ItemsSource="{Binding SendMails}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <!--Views:ListViewItemScheduler Text="{Binding SendDateTime}"/-->
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button Content="//" Width="25" Click="BtnEditEmailText_Click" Tag="{Binding SendDateTime}"/>
-                                        <DatePickerTextBox x:Name="dptxtbx" Width="125" Text="{Binding SendDateTime}"/>
-                                        <Button Content="-" Width="25" DataContext="{Binding Source={StaticResource MainWindow}}" Command="{Binding BtnDelMail}" CommandParameter="{Binding ElementName=dptxtbx, Path=Text}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                        <Button x:Name="btnSend" Command="{Binding BtnSendScheduledClickCommand}" CommandParameter="{Binding ElementName=PasBox, Path=SecurePassword}">
+                        <ListView x:Name="lstvwMails" Height="150" ItemsSource="{Binding SendMails}"/>
+                        <Button x:Name="btnSend" Command="{Binding BtnSendScheduledClickCommand}" CommandParameter="{Binding ElementName=PasBox}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="/MailSender;component/Images/clock.png" Width="16" Height="16"/>
                                 <TextBlock Margin="3,0,0,0" Text="Отправить запланированно" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
-                        <Button x:Name="btnSendAtOnce" Command="{Binding BtnSendAtOnceClickCommand}" CommandParameter="{Binding ElementName=PasBox, Path=SecurePassword}">
+                        <Button x:Name="btnSendAtOnce" Click="BtnSend_Click"  Command="{Binding BtnSendAtOnceClickCommand}" CommandParameter="{Binding ElementName=PasBox}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="/MailSender;component/Images/letter.jpg" Width="16" Height="16"/>
                                 <TextBlock Text="Отправить сразу" Margin="10,0,0,0"/>
@@ -106,7 +95,11 @@
                     <Label DockPanel.Dock="Top" Content="Заголовок письма:" HorizontalAlignment="Center"/>
                     <TextBox x:Name="txtbxSubject" DockPanel.Dock="Top" Margin="20,0,20,5"  Text="{Binding MailSubject}"/>
                     <Label DockPanel.Dock="Top" Content="Текст письма:" HorizontalAlignment="Center"/>
-                    <TextBox x:Name="txtbxBody" DockPanel.Dock="Top" Width="Auto" Height="Auto" Margin="20,0,20,20" Text="{Binding MailBody}"/>
+                    <xctk:RichTextBox x:Name="txtbxBody" DockPanel.Dock="Top" Width="Auto" Height="Auto" Margin="20,0,20,20" Text="{Binding MailBody}">
+                        <xctk:RichTextBox.TextFormatter>
+                            <xctk:PlainTextFormatter />
+                        </xctk:RichTextBox.TextFormatter>
+                    </xctk:RichTextBox>
                 </DockPanel>
             </TabItem>
             <TabItem Header="Статистика">

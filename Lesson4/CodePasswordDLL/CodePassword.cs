@@ -30,7 +30,7 @@ namespace CodePasswordDLL
         /// </summary>
         /// <param name="p_sPassword"></param>
         /// <returns></returns>
-        public static string getCodPassword(string password)
+        public static string GetCodPassword(string password)
         {
             string codPassword = "";
             foreach (char a in password)
