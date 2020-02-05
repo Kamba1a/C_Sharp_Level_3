@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="MailSender.Views.SaveEmailView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ViewModel="clr-namespace:MailSender.ViewModel"
+        xmlns:Services="clr-namespace:MailSender.Services"
+        xmlns:ignore="http://www.galasoft.ch/ignore"
+        mc:Ignorable="d ignore">
+
+    <UserControl.DataContext>
+        <ViewModel:SaveEmailViewModel/>
+    </UserControl.DataContext>
+
+    <!--обертка в AdornerDecorator решает проблему неработающей валидации при переключени вкладок-->
+    <AdornerDecorator>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="50"/>
+            <ColumnDefinition Width="Auto" MinWidth="90"/>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Добавить получателя:" FontWeight="Bold" Margin="0,50,0,0"/>
+        <Label Grid.Row="1" Content="Email:"/>
+        <Label Grid.Row="2" Content="Имя:"/>
+
+        <TextBox x:Name="txtbxEmail" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Text="{Binding StrEmail, Mode=TwoWay, UpdateSourceTrigger=LostFocus, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" Validation.Error="TextBox_Error"/>
+        <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" Text="{Binding StrName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+        <Button x:Name="btnSave" Content="Сохранить" FontWeight="Bold" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding SaveCommand}"/>
+    </Grid>
+    </AdornerDecorator>
+</UserControl>
